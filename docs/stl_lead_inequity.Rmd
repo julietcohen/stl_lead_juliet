@@ -1,0 +1,86 @@
+---
+title: "stl_lead_inequity"
+author: "Juliet"
+date: "8/9/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(janitor)
+library(here)
+library(skimr)
+```
+
+```{r}
+stl_lead <- read_delim(here::here("data", "stl_blood_lead.csv"), delim = ";") %>% 
+  clean_names() %>% 
+  mutate(prop_white = white / total_pop * 100) %>% 
+  mutate(pct_elevated = str_replace(pct_elevated, pattern = ",", replace = ".")) %>% 
+  mutate(pct_elevated = as.numeric(pct_elevated))
+
+#by line:
+#read in the data, use read_delim instead of read.csv because the csv file was not defaulted to using , as column separaters, you need to specify that you want to use ; as delim
+#clean col names
+#mutate to add new col with percentage of pop for white
+#update the existing col with new version to replace , with .
+#convert percent elevated to number, from charac to numeric
+
+```
+
+```{r}
+#names(stl_lead), looks messy
+janitor::clean_names(stl_lead)
+#column names now in lower snake case
+```
+
+```{r}
+
+#stl_lead_prop <- data.frame(stl_lead, stl_lead$prop_white)
+#stl_lead_prop
+#dplyr::mutate(prop_white = 100 * (stl_lead$white / stl_lead$totalPop))
+#will create a new column new_col that contains the value of col_a / col_b
+```
+
+## This figure shows that white people tend to have lower lead levels in their blood.
+
+```{r, fig.width=7,fig.height=9}
+#In a new code chunk, create a scatterplot graph of the percentage of children in each census tract with elevated blood lead levels (pctElevated) versus the percent of each census tract identifying as white.
+
+stl_lead_plot <- ggplot(data = stl_lead, aes(x = pct_elevated, y = prop_white)) +
+                            geom_point (aes(size = pct_elevated), alpha = 0.7, color = "red")
+
+
+stl_lead_plot
+
+#Customize by updating several aesthetics (e.g. size, opacity (see alpha =), color, etc.)
+#Store the scatterplot as stl_lead_plot
+#Have the scatterplot returned in the knitted html - customize the size that it appears when knitted
+#Also save a .png of the scatterplot to figs, with dimensions of (6 x 5) (width x height)
+#In text above or below the scatterplot, write 1 - 2 sentences describing the overall trend that you observe from #your graph
+
+```
+
+
+```{r, fig.width=6,fig.height=5}
+ggsave(here::here("figs", "stl_lead_plot.png"), plot = stl_lead_plot)
+
+```
+
+```{r, fig.width=6,fig.height=5}
+#Create a histogram of only the pctElevated column in the data frame
+#Customize the fill, color, and size aesthetics - test some stuff! Feel free to make it awful.
+#Once you’ve played around with customization, export the histogram as a .jpg to the figs folder
+#Make sure the histogram also shows up in your knitted html (customize the size)
+
+hist_elev <- ggplot(data = stl_lead, aes(x = pct_elevated)) +
+  geom_histogram(color = "green", fill = "dark green", size = 2)
+
+hist_elev
+
+ggsave(here::here("figs", "hist_elev.jpg"), plot = hist_elev)
+```
+
+
+
